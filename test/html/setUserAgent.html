@@ -1,0 +1,21 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <title>setUserAgent - Test</title>
+</head>
+<body>
+    <h1>setUserAgent</h1>
+    <div class="parent"></div>
+
+    <script>
+        setTimeout(function(){
+            var userAgent = document.createElement('div');
+            userAgent.classList.add('user-agent');
+            userAgent.textContent = navigator.userAgent;
+
+            document.querySelector('.parent').appendChild(userAgent);
+        }, 3000);
+    </script>
+</body>
+</html>

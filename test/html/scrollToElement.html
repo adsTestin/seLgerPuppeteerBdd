@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <title>scrollToElement - Test</title>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+    <style>
+      
+      #second {
+        margin: 250px;
+        height: 800px;
+        width: 2000px;
+        background-color: coral;
+      }
+
+      .spacer {
+        margin-bottom: 850px!important;
+      }
+
+    </style>
+  </head>
+  <body>
+    <h1>scrollToElement</h1>
+    <!-- First Element -->
+    <h1 id="first" class="spacer">
+      <a id="first-a" href="#" onclick="scrollFunction('second');return false;">Click me to scroll to second element
+        <p id="first-clue"></p></a>
+    </h1>
+    <!-- Second Element -->
+    <div id="second" class="spacer">
+      <a id="second-a" href="#" onclick="scrollFunction('third');return false;">Click me to scroll to third element
+        <p id="second-clue"></p></a>
+    </div>
+    <!-- Third Element -->
+    <div class="spacer">
+      <p id="third" >
+          Third Element
+        <p id="third-clue"></p>
+        <a id="third-a" href="#" onclick="scrollFunction('fourth');return false;">Click me to scroll to fourth element</a>
+      </p>
+    </div>
+    <!-- Fourth Element -->
+    <div class="spacer">
+      <input id="fourth" type="text" value="input-field">
+      <p id="fourth-clue"></p>
+      <a id="fourth-a" href="#" onclick="scrollFunction('first');return false;">Click me to scroll to first element</a>
+    </div>
+
+    <script>
+      function scrollFunction(id) {
+        const elmnt = document.getElementById(id);
+        const elmnt_a_tag = document.getElementById(id + "-a").focus();
+        const clue = document.getElementById(id + "-clue");
+        elmnt.scrollIntoView();
+      }
+
+      function elementsInViewPort() {
+        const first = document.querySelector("#first");
+        const second = document.querySelector("#second");
+        const third = document.querySelector("#third");
+        const fourth = document.querySelector("#fourth");
+        let clue;
+
+        // Gives a clue if element is in viewport
+        if (inViewport(first)) {
+          clue = document.querySelector("#first-clue");
+          clue.innerHTML = "In View";
+        } else {
+          clue = document.querySelector("#first-clue");
+          clue.innerHTML = "Out of View";
+        }
+
+        // Gives a clue if element is in viewport
+        if (inViewport(second)) {
+          clue = document.querySelector("#second-clue");
+          clue.innerHTML = "In View";
+        } else {
+          clue = document.querySelector("#second-clue");
+          clue.innerHTML = "Out of View";
+        }
+
+        // Gives a clue if element is in viewport
+        if (inViewport(third)) {
+          clue = document.querySelector("#third-clue");
+          clue.innerHTML = "In View";
+        } else {
+          clue = document.querySelector("#third-clue");
+          clue.innerHTML = "Out of View";
+        }
+
+        // Gives a clue if element is in viewport
+        if (inViewport(fourth)) {
+          clue = document.querySelector("#fourth-clue");
+          clue.innerHTML = "In View";
+        } else {
+          clue = document.querySelector("#fourth-clue");
+          clue.innerHTML = "Out of View";
+        }
+
+      }
+
+      function inViewport(element) {
+        // Get the elements position relative to the viewport
+
+        const bb = element.getBoundingClientRect();
+
+        // Check if the element is outside the viewport
+        // Then invert the returned value because you want to know the opposite
+
+        return !(bb.top > innerHeight || bb.bottom < 0);
+      }
+
+      document.addEventListener("scroll", event => {
+        // Check the viewport status
+
+        elementsInViewPort();
+      });
+
+      // Check the viewport status on start
+      elementsInViewPort();
+    </script>
+  </body>
+</html>

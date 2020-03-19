@@ -1,0 +1,75 @@
+version: 2
+
+# Reusable blocks for our Docker image and workspace config
+references:
+  container_config: &container_config
+    docker:
+      - image: patheard/node-puppeteer:latest # Node with headless Chrome dependencies
+    working_directory: /tmp/workspace
+  steps:
+    - &persist_to_workspace
+      persist_to_workspace:
+        root: /tmp/workspace
+        paths:
+          - . # Save the entire working directory
+    - &attach_workspace
+      attach_workspace:
+        at: /tmp/workspace
+
+jobs:
+
+  # In stall project dependencies and cache
+  build:
+    <<: *container_config
+    steps:
+      - checkout
+      - run: npm install
+      - *persist_to_workspace
+
+
+  # Behaviour tests against locally running service using JEST
+  behaviour_test:
+    <<: *container_config
+    steps:
+      - *attach_workspace
+      - run:
+          command: |
+            npm run test-server &
+            wget --retry-connrefused --tries 30 --waitretry 3 -qO- http://localhost:8080 &> /dev/null # Wait until the website is up before continuing
+            ENV=circleci npm start
+
+  # Security audits with Snyk.  Relies on SNYK_TOKEN environment variable.
+  security_test:
+    <<: *container_config
+    steps:
+      - *attach_workspace
+      - run: npm run snyk-test  
+
+  # Unit tests using JEST
+  unit_test:
+    <<: *container_config
+    steps:
+      - *attach_workspace 
+      - run:
+          command: |
+            npm run test-server &
+            wget --retry-connrefused --tries 30 --waitretry 3 -qO- http://localhost:8080 &> /dev/null # Wait until the website is up before continuing
+            ENV=circleci npm test
+            npm run test-coverage
+
+# Define job flow, dependencies and filters (when the job should run)
+workflows:
+  version: 2
+  test:
+    jobs:
+      - build
+      - behaviour_test:
+          requires:
+            - build
+      - unit_test:
+          requires:
+            - build
+      - security_test:
+          requires:
+            - build
+
